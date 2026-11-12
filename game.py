@@ -1,65 +1,67 @@
-def is_win(game):
-    win = False
-    # rows
-    if game[0][0] == game[0][1] == game[0][2] and (game[0][0] == 'X' or game[0][0] == 'O'):
-        win = True
-    if game[1][0] == game[1][1] == game[1][2] and (game[1][0] == 'X' or game[1][0] == 'O'):
-        win = True
-    if game[2][0] == game[2][1] == game[2][2] and (game[2][0] == 'X' or game[2][0] == 'O'):
-        win = True
-    # columns
-    if game[0][0] == game[1][0] == game[2][0] and (game[0][0] == 'X' or game[0][0] == 'O'):
-        win = True
-    if game[0][1] == game[1][1] == game[2][1] and (game[0][1] == 'X' or game[0][1] == 'O'):
-        win = True
-    if game[0][2] == game[1][2] == game[2][2] and (game[0][2] == 'X' or game[0][2] == 'O'):
-        win = True
-    # diagonals
-    if game[0][0] == game[1][1] == game[2][2] and (game[0][0] == 'X' or game[0][0] == 'O'):
-        win = True
-    if game[0][2] == game[1][1] == game[2][0] and (game[0][2] == 'X' or game[0][2] == 'O'):
-        win = True
-    return win
+PLAYER_X = "X"
+PLAYER_O = "O"
+EMPTY = " "
 
+def is_win(game): 
+    for row in game:
+        if ( row[0] == row[1] == row[2] and row[0] != EMPTY ): return True
+
+    for col in range(3):
+        if ( game[0][col] == game[1][col] == game[2][col] and game[0][col] != EMPTY ): return True
+
+    if ( game[0][0] == game[1][1] == game[2][2] and game[0][0] != EMPTY ): return True 
+
+    if ( game[0][2] == game[1][1] == game[2][0] and game[0][2] != EMPTY ): return True 
+
+    return False
+
+def print_board(game):
+    print("\nCurrent board:")
+    for row in game:
+        print(" | ".join(row))
+    print("-" * 9)
 
 def main():
-    # Initialize the game board
-    game = [[' ' for _ in range(3)] for _ in range(3)]
-    player1 = 'X'
-    player2 = 'O'
-    turn = True  # False for player 1's turn, True for player 2's turn. Player 1 first.
+    game = [[EMPTY for _ in range(3)] for _ in range(3)]
+    turn = False 
     
-    print("X = Player 1")
-    print("O = Player 2")
+    print(f"{PLAYER_X} = Player 1")
+    print(f"{PLAYER_O} = Player 2")
     
     for n in range(9):
-        turn = not turn  # Toggle turn
+        turn = not turn 
         
-        if turn == False:
-            print("Player 1: ", end="")
-        else:
-            print("Player 2: ", end="")
+        player = "Player 1" if turn == False else "Player 2"
+        mark = PLAYER_X if turn == False else PLAYER_O
         
-        print("Which cell to mark? i:[1..3], j:[1..3]: ", end="")
-        i, j = map(int, input().split())
-        
-        if turn == False:
-            game[i][j] = 'X'
-        else:
-            game[i][j] = 'O'
+        while True:
+            print(f"\n{player} ({mark}), which cell to mark? i:[1..3], j:[1..3]: ", end="")
+            try:
+                i, j = map(int, input().split())
+                i -= 1 
+                j -= 1
+                
+                if not (0 <= i <= 2 and 0 <= j <= 2):
+                    print("Invalid input. Please enter numbers between 1 and 3.")
+                    continue
+                
+                if game[i][j] != EMPTY:
+                    print("This cell is already taken! Please choose another.")
+                    continue
+                
+                break
+                
+            except ValueError:
+                print("Invalid format. Please enter two numbers separated by a space (e.g., '1 2').")
+
+        game[i][j] = mark
+        print_board(game)
         
         if is_win(game):
-            print("Win!")
-            break
-    
-    if n == 8:  # All 9 cells have been filled (n goes 0 to 8)
-        print("Tie!")
-    
-    # Show the game to console
-    print(game[0][0] + " " + game[0][1] + " " + game[0][2])
-    print(game[1][0] + " " + game[1][1] + " " + game[1][2])
-    print(game[2][0] + " " + game[2][1] + " " + game[2][2])
-
+            print(f"\nWin! {player} ({mark}) wins the game.")
+            return 
+            
+    print("\nTie!")
 
 if __name__ == "__main__":
     main()
